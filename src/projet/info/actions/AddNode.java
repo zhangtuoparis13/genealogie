@@ -5,12 +5,13 @@ import org.eclipse.swt.widgets.Display;
 import projet.info.commandInterpreter.CommandLine;
 
 public class AddNode implements CommandLine.ICommand {
-	
+
 	@Override
 	public boolean doIt(Vector v) {
-		System.out.println("Running the command : "+v.elementAt(0).toString());
+		System.out
+				.println("Running the command : " + v.elementAt(0).toString());
 		Display myDisplay = HandlingBinaryTrees.getDisplay();
-		if(v.size()==1) {
+		if (v.size() == 1) {
 			myDisplay.asyncExec(new Runnable() {
 				public void run() {
 					HandlingBinaryTrees grapher = new HandlingBinaryTrees();
@@ -19,16 +20,16 @@ public class AddNode implements CommandLine.ICommand {
 				}
 			});
 		} else {
-			int i=1;
-			while(i<v.size()) {
-				final String arg=v.get(i).toString();
+			int i = 1;
+			while (i < v.size()) {
+				final String arg = v.get(i).toString();
 				myDisplay.asyncExec(new Runnable() {
-						public void run() {
-							HandlingBinaryTrees grapher = new HandlingBinaryTrees();
-							grapher.addNode(arg);
-							grapher.showGraph();
-						}
-					});
+					public void run() {
+						HandlingBinaryTrees grapher = new HandlingBinaryTrees();
+						grapher.addNode(arg);
+						grapher.showGraph();
+					}
+				});
 				++i;
 			}
 		}

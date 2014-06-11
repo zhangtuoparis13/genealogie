@@ -5,7 +5,7 @@ import java.io.IOException;
 import projet.info.actions.HandlingBinaryTrees;
 
 public class MyMain {
-	
+
 	/**
 	 * NB le premier appel doit avoir lieu dans le thread de l'UI.
 	 * 
@@ -13,9 +13,9 @@ public class MyMain {
 	 */
 
 	public static void main(final String[] args) throws IOException {
-		
+
 		final HandlingBinaryTrees gView = new HandlingBinaryTrees();
-		
+
 		Runnable r = new Runnable() {
 			public void run() {
 				try {
@@ -26,7 +26,7 @@ public class MyMain {
 			}
 		};
 		new Thread(r).start();
-		
+
 		gView.open();
 	}
 }

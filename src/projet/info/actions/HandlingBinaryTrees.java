@@ -118,7 +118,8 @@ public class HandlingBinaryTrees {
 
 	public void showGraph() {
 
-		myGraph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NONE),true);
+		myGraph.setLayoutAlgorithm(new TreeLayoutAlgorithm(LayoutStyles.NONE),
+				true);
 		myGraph.applyLayout();
 		myShell.layout();
 	}
@@ -126,9 +127,9 @@ public class HandlingBinaryTrees {
 	public void addNode() {
 		addNode(String.valueOf(nbrNodes));
 	}
-	
+
 	public void addNode(String nom) {
-		GraphNode gn = new GraphNode(myGraph, ZestStyles.NONE,nom);
+		GraphNode gn = new GraphNode(myGraph, ZestStyles.NONE, nom);
 		gn.setBackgroundColor(ColorConstants.cyan);
 		listeNoeuds.add(gn);
 		Node patate = new Node(nom);
@@ -138,78 +139,116 @@ public class HandlingBinaryTrees {
 
 	private Node findNode(String toFind) {
 		Node FoundNode = null;
-		int i=0;
-		if(!myNetwork.nodes().isEmpty()) {
-			while(FoundNode==null && i<myNetwork.nodes().size()) {
-				if(FoundNode==null)
-					if(toFind.equals(myNetwork.nodes().get(i).getName()))
-						FoundNode=myNetwork.nodes().get(i);
+		int i = 0;
+		if (!myNetwork.nodes().isEmpty()) {
+			while (FoundNode == null && i < myNetwork.nodes().size()) {
+				if (FoundNode == null)
+					if (toFind.equals(myNetwork.nodes().get(i).getName()))
+						FoundNode = myNetwork.nodes().get(i);
 				++i;
 			}
 		}
 		return FoundNode;
 	}
-	
+
 	private GraphNode findGNode(String toFind) {
 		GraphNode FoundGNode = null;
-		int i=0;
-		if(nbrNodes>0) {
-			while(FoundGNode==null && i<nbrNodes) {
-				if(FoundGNode==null)
-					if(toFind.equals(listeNoeuds.get(i).getText()))
-						FoundGNode=listeNoeuds.get(i);
+		int i = 0;
+		if (nbrNodes > 0) {
+			while (FoundGNode == null && i < nbrNodes) {
+				if (FoundGNode == null)
+					if (toFind.equals(listeNoeuds.get(i).getText()))
+						FoundGNode = listeNoeuds.get(i);
 				++i;
 			}
 		}
 		return FoundGNode;
 	}
-	
+
 	// Sans paramètre, on détruit le dernier créé (Ctrl + Z ?)
-		public void delNode() {
-			delNode(myNetwork.nodes().get(myNetwork.nodes().size()-1).getName());
+	public void delNode() {
+		delNode(myNetwork.nodes().get(myNetwork.nodes().size() - 1).getName());
+	}
+
+	// On assume que "nodes" n'est pas vide
+	public void delNode(String yodel) {
+		Node Ndel = findNode(yodel);
+		GraphNode GNdel = findGNode(yodel);
+		// On détruit le node en interne
+		for (Node l : myNetwork.nodes())
+			myNetwork.disconnect(Ndel, l);
+		myNetwork.nodes().remove(Ndel);
+		// On détruit le node externe
+		int i = 0;
+		for (GraphConnection l : listeLinks) {
+			if (l.getSource().equals(GNdel)) {
+				listeLinks.get(i).dispose();
+				listeLinks.remove(i);
+			}
+			++i;
 		}
-		
-		// On assume que "nodes" n'est pas vide
-		public void delNode(String yodel) {
-			Node Ndel=findNode(yodel);
-			GraphNode GNdel=findGNode(yodel);
-			// On détruit le node en interne
-			for(Node l : myNetwork.nodes())
-				myNetwork.disconnect(Ndel, l);
-			myNetwork.nodes().remove(Ndel);
-			// On détruit le node externe
-			int i = 0;
-			for (GraphConnection l : listeLinks) {
-				if (l.getSource().equals(GNdel)) {
-					listeLinks.get(i).dispose();
-					listeLinks.remove(i);
-				}
+		GNdel.dispose();
+		listeNoeuds.remove(GNdel);
+		--nbrNodes;
+	}
+
+	public void displaySons(String which) {
+		int i = 0;
+		Node Nwhich = null;
+		GraphNode GNwhich = null;
+
+		if (!myNetwork.nodes().isEmpty())
+			while (Nwhich == null && i < myNetwork.nodes().size()) {
+				if (Nwhich == null)
+					if (which.equals(myNetwork.nodes().get(i).getName()))
+						Nwhich = myNetwork.nodes().get(i);
 				++i;
 			}
-			GNdel.dispose();
-			listeNoeuds.remove(GNdel);
-			--nbrNodes;
+		if (Nwhich == null) {
+			System.out.println("Erreur displaySons : Personne"
+					+ ((Nwhich == null) ? "s" : "") + " non existante"
+					+ ((Nwhich == null) ? "s" : "") + " !");
+		} else {
+			i = 0;
+			while (GNwhich == null && i < nbrNodes) {
+				if (GNwhich == null)
+					if (which.equals(listeNoeuds.get(i).getText()))
+						GNwhich = listeNoeuds.get(i);
+				++i;
+			}
+			/*
+			 * List T[] = { "-1" }; for (i = 0; i < listeLinks.size(); i++) T[i]
+			 * = "-1"; i = 0; for (GraphConnection l : listeLinks) if
+			 * (l.getSource().equals(GNwhich)) { T[i] =
+			 * l.getDestination().getText(); ++i; } if (i == 0)
+			 * System.out.println("Cette personne ne possède aucun enfant...");
+			 * else { addNode(which); for (i = 0; i < listeLinks.size() && T[i]
+			 * != "-1"; i++) { addNode(T[i]); addLink(which, T[i]); } }
+			 */
 		}
-		
+	}
 
-	public void addLink(String from,String to) {
-		int i=0;
-		Node Nfrom=this.findNode(from), Nto=this.findNode(to);
-		if(Nfrom==null || Nto==null) {
-			System.out.println("Erreur addLink : Personne"+((Nfrom == null && Nto == null) ? "s" : "")+
-					" non existante"+((Nfrom == null && Nto == null) ? "s" : "")+" !");
+	public void addLink(String from, String to) {
+		int i = 0;
+		Node Nfrom = this.findNode(from), Nto = this.findNode(to);
+		if (Nfrom == null || Nto == null) {
+			System.out.println("Erreur addLink : Personne"
+					+ ((Nfrom == null && Nto == null) ? "s" : "")
+					+ " non existante"
+					+ ((Nfrom == null && Nto == null) ? "s" : "") + " !");
 		} else {
 			myNetwork.connect(Nfrom, Nto);
-			GraphNode GNfrom=this.findGNode(from);
-			GraphNode GNto=this.findGNode(to);
-			listeLinks.add(new GraphConnection(myGraph, ZestStyles.NONE,GNfrom,GNto));
+			GraphNode GNfrom = this.findGNode(from);
+			GraphNode GNto = this.findGNode(to);
+			listeLinks.add(new GraphConnection(myGraph, ZestStyles.NONE,
+					GNfrom, GNto));
 		}
 	}
 
 	public void delLink(String from, String to) {
-		int i=0;
+		int i = 0;
 		Node Nfrom = findNode(from), Nto = findNode(to);
-		GraphNode GNfrom = findGNode(from), GNto = findGNode(to);		
+		GraphNode GNfrom = findGNode(from), GNto = findGNode(to);
 		i = 0;
 		for (GraphConnection l : listeLinks) {
 			if (l.getSource().equals(GNfrom)) {
@@ -225,23 +264,24 @@ public class HandlingBinaryTrees {
 			System.out.println("Erreur delLink : Lien non existant !");
 		}
 	}
-	
+
 	private String formatText(String unf_str) {
-		String for_str=unf_str;
-		for_str=for_str.replace("\n", "");
-		for_str=for_str.replace("\t", "");
+		String for_str = unf_str;
+		for_str = for_str.replace("\n", "");
+		for_str = for_str.replace("\t", "");
 		return for_str;
 	}
-	
+
 	public void loadData(Document XMLFile) {
-		XMLFile.getDocumentElement().normalize();		// Permet d'éviter les XML mal écrits
+		XMLFile.getDocumentElement().normalize(); // Permet d'éviter les XML mal
+													// écrits
 		NodeList personnes = XMLFile.getElementsByTagName("personne");
 		NodeList liens = XMLFile.getElementsByTagName("fils");
 		// Chaque node défini est rajouté
-		for(int i=0;i<personnes.getLength();++i)
+		for (int i = 0; i < personnes.getLength(); ++i)
 			addNode(formatText(personnes.item(i).getTextContent()));
 		// On rajoute les liens après
-		for(int i=0;i<liens.getLength();++i)
+		for (int i = 0; i < liens.getLength(); ++i)
 			addLink(formatText(((Element) liens.item(i)).getAttribute("pere")),
 					formatText(((Element) liens.item(i)).getAttribute("enfant")));
 	}
