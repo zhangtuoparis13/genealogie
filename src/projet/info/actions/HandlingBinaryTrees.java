@@ -109,6 +109,8 @@ public class HandlingBinaryTrees {
 		jr.assignClassToCommand("addLink", "projet.info.actions.AddLink");
 		jr.assignClassToCommand("delLink", "projet.info.actions.DelLink");
 		jr.assignClassToCommand("loadData", "projet.info.actions.LoadData");
+		jr.assignClassToCommand("displaySons",
+				"projet.info.actions.DisplaySons");
 		jr.init();
 		jr.setIsInteractive(interactive);
 		// parse and execute commands.
@@ -194,42 +196,39 @@ public class HandlingBinaryTrees {
 
 	public void displaySons(String which) {
 		int i = 0;
-		Node Nwhich = null;
-		GraphNode GNwhich = null;
+		Node Nwhich = this.findNode(which);
 
-		if (!myNetwork.nodes().isEmpty())
-			while (Nwhich == null && i < myNetwork.nodes().size()) {
-				if (Nwhich == null)
-					if (which.equals(myNetwork.nodes().get(i).getName()))
-						Nwhich = myNetwork.nodes().get(i);
-				++i;
-			}
 		if (Nwhich == null) {
 			System.out.println("Erreur displaySons : Personne"
 					+ ((Nwhich == null) ? "s" : "") + " non existante"
 					+ ((Nwhich == null) ? "s" : "") + " !");
 		} else {
+			GraphNode GNwhich = this.findGNode(which);
+
+			String T[] = new String[listeLinks.size()];
+			for (i = 0; i < listeLinks.size(); i++)
+				T[i] = "-1";
 			i = 0;
-			while (GNwhich == null && i < nbrNodes) {
-				if (GNwhich == null)
-					if (which.equals(listeNoeuds.get(i).getText()))
-						GNwhich = listeNoeuds.get(i);
-				++i;
+			for (GraphConnection l : listeLinks)
+				if (l.getSource().equals(GNwhich)) {
+					T[i] = l.getDestination().getText();
+					++i;
+				}
+			if (i == 0)
+				System.out.println("Cette personne ne possède aucun enfant...");
+			else {
+				addNode("." + which + ".");
+				for (i = 0; i < listeLinks.size() && T[i] != "-1"; i++) {
+					addNode("." + T[i] + ".");
+					addLink("." + which + ".", "." + T[i] + ".");
+					System.out.println(T[i]);
+				}
 			}
-			/*
-			 * List T[] = { "-1" }; for (i = 0; i < listeLinks.size(); i++) T[i]
-			 * = "-1"; i = 0; for (GraphConnection l : listeLinks) if
-			 * (l.getSource().equals(GNwhich)) { T[i] =
-			 * l.getDestination().getText(); ++i; } if (i == 0)
-			 * System.out.println("Cette personne ne possède aucun enfant...");
-			 * else { addNode(which); for (i = 0; i < listeLinks.size() && T[i]
-			 * != "-1"; i++) { addNode(T[i]); addLink(which, T[i]); } }
-			 */
+
 		}
 	}
 
 	public void addLink(String from, String to) {
-		int i = 0;
 		Node Nfrom = this.findNode(from), Nto = this.findNode(to);
 		if (Nfrom == null || Nto == null) {
 			System.out.println("Erreur addLink : Personne"
@@ -248,7 +247,7 @@ public class HandlingBinaryTrees {
 	public void delLink(String from, String to) {
 		int i = 0;
 		Node Nfrom = findNode(from), Nto = findNode(to);
-		GraphNode GNfrom = findGNode(from), GNto = findGNode(to);
+		GraphNode GNfrom = findGNode(from);
 		i = 0;
 		for (GraphConnection l : listeLinks) {
 			if (l.getSource().equals(GNfrom)) {
