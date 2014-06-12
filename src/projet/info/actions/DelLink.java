@@ -19,8 +19,8 @@ public class DelLink implements CommandLine.ICommand {
 					System.out.println("Erreur " + v.get(0).toString()
 							+ " : Arguments identiques !");
 				} else {
-					final String arg1 = v.get(1).toString();
-					final String arg2 = v.get(2).toString();
+					final String arg1 = ((v.get(1) instanceof Double) ? new StringBuilder().append(""+(((Double) v.get(1)).intValue())).toString() : v.get(1).toString());
+					final String arg2 = ((v.get(2) instanceof Double) ? new StringBuilder().append(""+(((Double) v.get(2)).intValue())).toString() : v.get(2).toString());
 					myDisplay.asyncExec(new Runnable() {
 						public void run() {
 							HandlingBinaryTrees grapher = new HandlingBinaryTrees();

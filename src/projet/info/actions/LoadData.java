@@ -3,13 +3,8 @@ package projet.info.actions;
 import java.io.File;
 import java.util.Vector;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import projet.info.commandInterpreter.CommandLine;
-import projet.info.parser.MyHandler;
-
 import org.eclipse.swt.widgets.Display;
 import org.w3c.dom.Document;
 
@@ -17,8 +12,18 @@ public class LoadData implements CommandLine.ICommand {
 	@Override
 	public boolean doIt(Vector v) {
 		if (v.size() > 1) {
+			String arg=null;
 			System.out.println("Chargement du fichier...");
-			File XMLFile = new File(v.get(1).toString());
+			// Si l'utilisateur oublie le XML, le rajouter
+			if(!v.get(1).toString().substring(v.get(1).toString().length()-4,v.get(1).toString().length()).equalsIgnoreCase(".xml")) {
+				StringBuilder pattEx = new StringBuilder();
+				pattEx.append(v.get(1).toString());
+				pattEx.append(".xml");
+				arg=pattEx.toString();
+			} else {
+				arg=v.get(1).toString();
+			}
+			File XMLFile = new File(arg);
 			if (XMLFile.exists()) {
 				try {
 					final Document FinalXML = DocumentBuilderFactory
@@ -34,12 +39,12 @@ public class LoadData implements CommandLine.ICommand {
 					});
 				} catch (Exception e) {
 					System.out.println("Erreur " + v.elementAt(0).toString()
-							+ " : Impossible de parser " + v.get(1).toString()
+							+ " : Impossible de parser " + arg
 							+ " !");
 				}
 			} else {
 				System.out.println("Erreur " + v.elementAt(0).toString()
-						+ " : Le fichier " + v.get(1) + " est inexistant");
+						+ " : Le fichier " + arg + " est inexistant");
 			}
 		} else {
 			System.out.println("Erreur " + v.elementAt(0).toString()

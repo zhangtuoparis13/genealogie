@@ -9,8 +9,7 @@ import projet.info.commandInterpreter.CommandLine;
 public class ShowSons implements CommandLine.ICommand {
 	@Override
 	public boolean doIt(Vector v) {
-		System.out
-				.println("Running the command : " + v.elementAt(0).toString());
+		System.out.println("Running the command : " + v.elementAt(0).toString());
 		Display myDisplay = HandlingBinaryTrees.getDisplay();
 		final String arg = v.get(1).toString();
 		myDisplay.asyncExec(new Runnable() {

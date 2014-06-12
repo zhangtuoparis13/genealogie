@@ -1,8 +1,10 @@
 package projet.info.actions;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StreamTokenizer;
@@ -11,8 +13,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.eclipse.zest.core.widgets.Graph;
 import org.eclipse.zest.core.widgets.GraphConnection;
@@ -205,11 +213,10 @@ public class HandlingBinaryTrees {
 		return resultfinal;
 	}
 	
-	private ArrayList<String> StaticToList(String T[]) {
-		//ArrayList<String> aListNumbers = new ArrayList<String>(Arrays.asList(strValues));
-		//List<String> strings = Arrays.asList("foo","bar");
+/*	private ArrayList<String> StaticToList(String T[]) {
+		
 		return null;
-	}
+	}*/
 
 	public String[] sons(String which) {
 		return sons(which, true);
@@ -292,7 +299,7 @@ public class HandlingBinaryTrees {
 			asc(T[i++]);
 	}
 
-	public String[] oncles(String which) {
+/*	public String[] oncles(String which) {
 		String T[] = father(which); // liste des pères
 		ArrayList<String> GP = new ArrayList<String>();
 		for (String papa : T) {
@@ -315,7 +322,7 @@ public class HandlingBinaryTrees {
 		for (int r = 0; r < Result.size(); ++r)
 			System.out.println(resultfinal[r]);
 		return resultfinal;
-	}
+	}*/
 
 	public void addLink(String from, String to) {
 		Node Nfrom = this.findNode(from), Nto = this.findNode(to);
@@ -372,5 +379,44 @@ public class HandlingBinaryTrees {
 		for (int i = 0; i < liens.getLength(); ++i)
 			addLink(formatText(((Element) liens.item(i)).getAttribute("pere")),
 					formatText(((Element) liens.item(i)).getAttribute("enfant")));
+	}
+
+	public void saveData() {
+		saveData("temp.xml");
+	}
+	
+	public void saveData(String Fils) {
+		// si pas d'extension XML, l'ajouter
+		if(!Fils.substring(Fils.length()-4,Fils.length()).equalsIgnoreCase(".xml")) {
+			StringBuilder pattEx = new StringBuilder();
+			pattEx.append(Fils+".xml");
+			Fils=pattEx.toString();
+		}
+		// Sauvegarde
+		try {
+			Document SaveXML = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+			// créer le root
+			Element root = SaveXML.createElement("company");
+			SaveXML.appendChild(root);
+			// On enregistre les nodes...
+			for(Node N : myNetwork.nodes()) {
+				Element temp = SaveXML.createElement("personne");
+				temp.setAttribute("id", N.getName());
+				temp.appendChild(SaveXML.createElement("personne").appendChild(SaveXML.createTextNode(N.getName())));
+				root.appendChild(temp);
+			}
+			// Maintenant, les links !
+			for(Link l : myNetwork.links()) {
+				Element temp = SaveXML.createElement("fils");
+				temp.setAttribute("pere",l.source().toString().substring(1,l.source().toString().length()-1));
+				temp.setAttribute("enfant",l.destination().toString().substring(1,l.destination().toString().length()-1));
+				root.appendChild(temp);
+			}
+			// Enfin, on écrit tout cela
+			Transformer useless = TransformerFactory.newInstance().newTransformer();
+			useless.transform(new DOMSource(SaveXML), new StreamResult(new File(Fils)));
+		} catch (Exception e) {
+			System.out.println("Erreur saveData : Impossible de sauvegarder dans "+Fils+" !");
+		}
 	}
 }
