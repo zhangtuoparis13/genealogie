@@ -68,7 +68,7 @@ public class HandlingBinaryTrees {
 
 	public void open() {
 
-		myShell.setText("Arbre généalogique");
+		myShell.setText("Arbre gÃ©nÃ©alogique");
 		myShell.setLayout(new FillLayout());
 		myShell.setSize(1080, 640);
 		myShell.setVisible(true);
@@ -83,7 +83,7 @@ public class HandlingBinaryTrees {
 		}
 
 		myDisplay.dispose();
-		System.out.println("Programme terminé");
+		System.out.println("Programme terminÃ©");
 
 	}
 
@@ -145,7 +145,7 @@ public class HandlingBinaryTrees {
 		Node FoundNode = null;
 		int i = 0;
 		if (!myNetwork.nodes().isEmpty() && toFind != null) {
-			System.out.println("Paramètre : " + toFind);
+			System.out.println("ParamÃ¨tre : " + toFind);
 			while (FoundNode == null && i < myNetwork.nodes().size()) {
 				if (FoundNode == null) {
 					if (toFind.equals(myNetwork.nodes().get(i).getName())) {
@@ -172,7 +172,7 @@ public class HandlingBinaryTrees {
 		return FoundGNode;
 	}
 
-	// Sans paramètre, on détruit le dernier créé (Ctrl + Z ?)
+	// Sans paramÃ¨tre, on dÃ©truit le dernier crÃ©Ã© (Ctrl + Z ?)
 	public void delNode() {
 		delNode(myNetwork.nodes().get(myNetwork.nodes().size() - 1).getName());
 	}
@@ -181,11 +181,11 @@ public class HandlingBinaryTrees {
 	public void delNode(String yodel) {
 		Node Ndel = findNode(yodel);
 		GraphNode GNdel = findGNode(yodel);
-		// On détruit le node en interne
+		// On dÃ©truit le node en interne
 		for (Node l : myNetwork.nodes())
 			myNetwork.disconnect(Ndel, l);
 		myNetwork.nodes().remove(Ndel);
-		// On détruit le node externe
+		// On dÃ©truit le node externe
 		int i = 0;
 		for (GraphConnection l : listeLinks) {
 			if (l.getSource().equals(GNdel)) {
@@ -221,7 +221,7 @@ public class HandlingBinaryTrees {
 				}
 			T[i] = "-1";
 			if (i == 0)
-				System.out.println("Cette personne ne possède aucun enfant...");
+				System.out.println("Cette personne ne possÃ¨de aucun enfant...");
 			else if (display) {
 				if (this.findNode(which) == null)
 					addNode("." + which + ".");
@@ -234,14 +234,9 @@ public class HandlingBinaryTrees {
 		return T;
 	}
 
-	public String[] fathers(String which) {
-		return fathers(which, true);
-	}
-
-	public String[] fathers(String which, Boolean display) {
+	public String[] father(String which) {
 		int i = 0;
-		String T[][] = new String[listeLinks.size() * listeLinks.size()][listeLinks
-		                                                 				.size() * listeLinks.size()];
+		String T[] = new String[listeLinks.size()];
 		Node Nwhich = this.findNode(which);
 
 		if (Nwhich == null) {
@@ -250,17 +245,16 @@ public class HandlingBinaryTrees {
 					+ ((Nwhich == null) ? "s" : "") + " !");
 		} else {
 			GraphNode GNwhich = this.findGNode(which);
-
+			
 			for (GraphConnection l : listeLinks)
 				if (l.getDestination().equals(GNwhich)) {
 					T[i++] = l.getSource().getText();
 				}
 			T[i] = "-1";
 			if (i == 0)
-				System.out.println("Cette personne ne possède aucun enfant...");
-			else if (display) {
-				if (this.findNode(which) == null)
-					addNode("." + which + ".");
+				System.out.println("Cette personne ne possï¿½de aucun enfant...");
+			else {
+				if (this.findNode(which) == null) addNode("." + which + ".");
 				for (i = 0; i < listeLinks.size() && T[i] != "-1"; i++) {
 					addNode("." + T[i] + ".");
 					addLink("." + T[i] + ".", "." + which + ".");
@@ -279,21 +273,17 @@ public class HandlingBinaryTrees {
 	}
 
 	public void asc(String which) {
-		asc(which, true, -1);
-	}
-
-	public String[][] asc(String which, Boolean display, int val) {
-		String T[][] = new String[listeLinks.size() * listeLinks.size()][listeLinks
-				.size() * listeLinks.size()];
 		int i = 0;
-		T = fathers(which, display);
-
-		while (T[val][i] != "-1")
-			T = asc(T[val][i++], display, ++val);
-		return T;
+		String T[] = father(which);
+		while(T[i]!="-1")
+			asc(T[i++]);
+	}
+	
+	public void oncles(String which) {
+		
 	}
 
-	public void oncles(String which) {
+/*	public void oncles(String which) {
 		oncles(which, 0);
 	}
 
@@ -304,9 +294,9 @@ public class HandlingBinaryTrees {
 		/*
 		 * while (T[i++] != "-1"); if (T[0] != "-1") sons(T[i], true); // x1
 		 */
-		for (String[] k : T)
+		/*for (String[] k : T)
 			System.out.println(k);
-	}
+	}*/
 
 	public void addLink(String from, String to) {
 		Node Nfrom = this.findNode(from), Nto = this.findNode(to);
@@ -352,14 +342,14 @@ public class HandlingBinaryTrees {
 	}
 
 	public void loadData(Document XMLFile) {
-		XMLFile.getDocumentElement().normalize(); // Permet d'éviter les XML mal
-													// écrits
+		XMLFile.getDocumentElement().normalize(); // Permet d'Ã©viter les XML mal
+													// Ã©crits
 		NodeList personnes = XMLFile.getElementsByTagName("personne");
 		NodeList liens = XMLFile.getElementsByTagName("fils");
-		// Chaque node défini est rajouté
+		// Chaque node dÃ©fini est rajoutÃ©
 		for (int i = 0; i < personnes.getLength(); ++i)
 			addNode(formatText(personnes.item(i).getTextContent()));
-		// On rajoute les liens après
+		// On rajoute les liens aprÃ¨s
 		for (int i = 0; i < liens.getLength(); ++i)
 			addLink(formatText(((Element) liens.item(i)).getAttribute("pere")),
 					formatText(((Element) liens.item(i)).getAttribute("enfant")));
