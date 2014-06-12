@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><company><personne id="1">1</personne><personne id="2">2</personne><personne id="3">3</personne><personne id="4">4</personne><personne id="5">5</personne><fils enfant="2" pere="1"/><fils enfant="3" pere="1"/></company>

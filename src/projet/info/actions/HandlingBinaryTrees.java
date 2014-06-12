@@ -122,6 +122,9 @@ public class HandlingBinaryTrees {
 		jr.assignClassToCommand("desc", "projet.info.actions.ShowDescendants");
 		jr.assignClassToCommand("asc", "projet.info.actions.ShowAscendants");
 		jr.assignClassToCommand("oncles", "projet.info.actions.ShowOncles");
+		jr.assignClassToCommand("cousins", "projet.info.actions.ShowCousins");
+		jr.assignClassToCommand("onclesCom", "projet.info.actions.OnclesCom");
+		jr.assignClassToCommand("cousinsCom", "projet.info.actions.CousinsCom");
 		jr.init();
 		jr.setIsInteractive(interactive);
 		// parse and execute commands.
@@ -172,8 +175,10 @@ public class HandlingBinaryTrees {
 		if (nbrNodes > 0 && toFind != null) {
 			while (FoundGNode == null && i < nbrNodes) {
 				if (FoundGNode == null)
-					if (toFind.equals(listeNoeuds.get(i).getText()))
+					if (toFind.equals(listeNoeuds.get(i).getText())) {
 						FoundGNode = listeNoeuds.get(i);
+						break; // stopper la boucle car égalité trouvée
+					}
 				++i;
 			}
 		}
@@ -189,25 +194,30 @@ public class HandlingBinaryTrees {
 	public void delNode(String yodel) {
 		Node Ndel = findNode(yodel);
 		GraphNode GNdel = findGNode(yodel);
-		// On détruit le node en interne
-		for (Node l : myNetwork.nodes())
-			myNetwork.disconnect(Ndel, l);
-		myNetwork.nodes().remove(Ndel);
-		// On détruit le node externe
-		int i = 0;
-		for (GraphConnection l : listeLinks) {
-			if (l.getSource().equals(GNdel)) {
-				listeLinks.get(i).dispose();
-				listeLinks.remove(i);
+		
+		if(Ndel == null)
+			System.out.println("Erreur delNode : "+yodel+" n'existe pas !");
+		else {
+			// On détruit le node en interne
+			for (Node l : myNetwork.nodes())
+				myNetwork.disconnect(Ndel, l);
+			myNetwork.nodes().remove(Ndel);
+			// On détruit le node externe
+			int i = 0;
+			for (GraphConnection l : listeLinks) {
+				if (l.getSource().equals(GNdel)) {
+					listeLinks.get(i).dispose();
+					listeLinks.remove(i);
+				}
+				++i;
 			}
-			++i;
+			GNdel.dispose();
+			listeNoeuds.remove(GNdel);
+			--nbrNodes;
 		}
-		GNdel.dispose();
-		listeNoeuds.remove(GNdel);
-		--nbrNodes;
 	}
 
-	private String[] ListToStatic(ArrayList<String> T) {
+	public String[] ListToStatic(ArrayList<String> T) {
 		String resultfinal[] = new String[T.size()];
 		T.toArray(resultfinal);
 		return resultfinal;
@@ -250,7 +260,7 @@ public class HandlingBinaryTrees {
 				}
 			}
 		}
-		return ListToStatic(T);
+		return T;
 	}
 
 	public String[] father(String which) {
@@ -259,9 +269,7 @@ public class HandlingBinaryTrees {
 		Node Nwhich = this.findNode(which);
 
 		if (Nwhich == null) {
-			System.out.println("Erreur sons : Personne"
-					+ ((Nwhich == null) ? "s" : "") + " non existante"
-					+ ((Nwhich == null) ? "s" : "") + " !");
+			System.out.println("Erreur sons : Personne non existante !");
 		} else {
 			GraphNode GNwhich = this.findGNode(which);
 
@@ -271,7 +279,7 @@ public class HandlingBinaryTrees {
 					++i;
 				}
 			if (i == 0)
-				System.out.println("Cette personne ne poss�de aucun enfant...");
+				System.out.println("Cette personne ne possede aucun enfant...");
 			else {
 				if (this.findNode(which) == null)
 					addNode("." + which + ".");
@@ -281,7 +289,7 @@ public class HandlingBinaryTrees {
 				}
 			}
 		}
-		return ListToStatic(T);
+		return T;
 	}
 
 	public void desc(String which) {
@@ -299,30 +307,84 @@ public class HandlingBinaryTrees {
 			asc(T[i++]);
 	}
 
-/*	public String[] oncles(String which) {
-		String T[] = father(which); // liste des pères
-		ArrayList<String> GP = new ArrayList<String>();
-		for (String papa : T) {
-			String temp[] = father(papa);
-			for (String output : temp)
-				if (!GP.contains(output))
-					GP.add(output);
+	public ArrayList<String> oncles(String which) {
+		ArrayList<String> Result = null;
+		if(findNode(which)!=null) {
+			ArrayList<String> T = father(which); // liste des pÃ¨res
+			ArrayList<String> GP = new ArrayList<String>();
+			for (String papa : T) {
+				ArrayList<String> temp = father(papa);
+				for (String output : temp)
+					if (!GP.contains(output))
+						GP.add(output);
+			}
+			// on a tous les grands pÃ¨res en liste unique
+			Result = new ArrayList<String>();
+			for (String papi : GP) {
+				ArrayList<String> temp = sons(papi, false);
+				for (String marredeslocales : temp)
+					// Ai-je dÃ©jÃ  stockÃ© le rÃ©sultat ? Suis-je mon propre pÃ¨re ?
+					if (!(Result.contains(marredeslocales) || T.contains(marredeslocales)))
+						Result.add(marredeslocales);
+			}
+		} else {
+			System.out.println("Erreur oncles : Node cible non trouvÃ©");
 		}
-		// on a tous les grands pères en liste unique
-		ArrayList<String> Result = new ArrayList<String>();
-		for (String papi : GP) {
-			String temp[] = sons(papi, false);
-			for (String marredeslocales : temp)
-				// Ai-je déjà stocké le résultat ? Suis-je mon propre père ?
-				if (!(Result.contains(marredeslocales) || T.contains(marredeslocales)))
-					Result.add(marredeslocales);
+		return Result;
+	}
+	
+	public ArrayList<String> cousins(String which) {
+		ArrayList<String> Result = null;
+		
+		if(findNode(which)!=null) {
+			// On rÃ©utilise oncles() pour sauter des Ã©tapes dans la fonction
+			ArrayList<String> T = oncles(which);
+			Result=new ArrayList<String>();
+			for(String papi : T) {
+				ArrayList<String> temp = sons(papi, false);
+				for(String locale : temp)
+				// Ne rajoutons que si ce n'est pas dÃ©jÃ  fait
+				// On a dÃ©jÃ  supprimÃ© les pÃ¨res via la fonction oncles(), donc, inutile en thÃ©orie de vÃ©rifier que nous ne sommes pas notre propre cousin
+					if(!Result.contains(locale))
+						Result.add(locale);
+			}
+		} else {
+			System.out.println("Erreur cousins : Node cible non trouvÃ©");
 		}
-		String resultfinal[] = new String[Result.size()];
-		Result.toArray(resultfinal);
-		for (int r = 0; r < Result.size(); ++r)
-			System.out.println(resultfinal[r]);
-		return resultfinal;
-	}*/
+		return Result;
+	}
+	
+	public ArrayList<String> onclesCom(String which,String who) {
+		ArrayList<String> Result = null;
+		if(findNode(which)==null || findNode(who)==null) {
+			System.out.println("Erreur compOncles : Node introuvable");
+		} else {	
+			ArrayList<String> onclesWho = oncles(who);
+			ArrayList<String> onclesWhich = oncles(which);
+			Result = new ArrayList<String>();
+			// Le tableau parcouru n'a que peu d'importance
+			for(String comp : onclesWho)
+				if(onclesWhich.contains(comp))
+					Result.add(comp);
+		}
+		return Result;
+	}
+	
+	public ArrayList<String> cousinsCom(String which,String who) {
+		ArrayList<String> Result = null;
+		if(findNode(which)==null || findNode(who)==null) {
+			System.out.println("Erreur compOncles : Node introuvable");
+		} else {
+			ArrayList<String> onclesWho = cousins(who);
+			ArrayList<String> onclesWhich = cousins(which);
+			Result = new ArrayList<String>();
+			// Le tableau parcouru n'a que peu d'importance
+			for(String comp : onclesWho)
+				if(onclesWhich.contains(comp))
+					Result.add(comp);
+		}
+		return Result;
+	}
 
 	public void addLink(String from, String to) {
 		Node Nfrom = this.findNode(from), Nto = this.findNode(to);
@@ -344,19 +406,25 @@ public class HandlingBinaryTrees {
 		int i = 0;
 		Node Nfrom = findNode(from), Nto = findNode(to);
 		GraphNode GNfrom = findGNode(from);
-		i = 0;
-		for (GraphConnection l : listeLinks) {
-			if (l.getSource().equals(GNfrom)) {
-				break;
+		
+		if (Nfrom == null || Nto == null)
+			System.out.println("Erreur delLink : Personne"
+					+ ((Nfrom == null && Nto == null) ? "s" : "") + " non existante"
+					+ ((Nfrom == null && Nto == null) ? "s" : "") + " !");
+		else {
+			for (GraphConnection l : listeLinks) {
+				if (l.getSource().equals(GNfrom)) {
+					break;
+				}
+				++i;
 			}
-			++i;
-		}
-		if (i < listeLinks.size()) {
-			myNetwork.disconnect(Nfrom, Nto);
-			listeLinks.get(i).dispose();
-			listeLinks.remove(i);
-		} else {
-			System.out.println("Erreur delLink : Lien non existant !");
+			if (i < listeLinks.size()) {
+				myNetwork.disconnect(Nfrom, Nto);
+				listeLinks.get(i).dispose();
+				listeLinks.remove(i);
+			} else {
+				System.out.println("Erreur delLink : Lien non existant !");
+			}
 		}
 	}
 
