@@ -6,7 +6,7 @@ import org.eclipse.swt.widgets.Display;
 
 import projet.info.commandInterpreter.CommandLine;
 
-public class DisplaySons implements CommandLine.ICommand {
+public class ShowSons implements CommandLine.ICommand {
 	@Override
 	public boolean doIt(Vector v) {
 		System.out
@@ -16,7 +16,7 @@ public class DisplaySons implements CommandLine.ICommand {
 		myDisplay.asyncExec(new Runnable() {
 			public void run() {
 				HandlingBinaryTrees grapher = new HandlingBinaryTrees();
-				grapher.displaySons(arg);
+				grapher.sons(arg);
 				grapher.showGraph();
 			}
 		});

@@ -109,8 +109,8 @@ public class HandlingBinaryTrees {
 		jr.assignClassToCommand("addLink", "projet.info.actions.AddLink");
 		jr.assignClassToCommand("delLink", "projet.info.actions.DelLink");
 		jr.assignClassToCommand("loadData", "projet.info.actions.LoadData");
-		jr.assignClassToCommand("displaySons",
-				"projet.info.actions.DisplaySons");
+		jr.assignClassToCommand("sons", "projet.info.actions.ShowSons");
+		jr.assignClassToCommand("desc", "projet.info.actions.ShowDescendants");
 		jr.init();
 		jr.setIsInteractive(interactive);
 		// parse and execute commands.
@@ -194,38 +194,41 @@ public class HandlingBinaryTrees {
 		--nbrNodes;
 	}
 
-	public void displaySons(String which) {
+	public String[] sons(String which) {
 		int i = 0;
+		String T[] = new String[listeLinks.size()];
 		Node Nwhich = this.findNode(which);
 
 		if (Nwhich == null) {
-			System.out.println("Erreur displaySons : Personne"
+			System.out.println("Erreur sons : Personne"
 					+ ((Nwhich == null) ? "s" : "") + " non existante"
 					+ ((Nwhich == null) ? "s" : "") + " !");
 		} else {
 			GraphNode GNwhich = this.findGNode(which);
-
-			String T[] = new String[listeLinks.size()];
-			for (i = 0; i < listeLinks.size(); i++)
-				T[i] = "-1";
-			i = 0;
+			
 			for (GraphConnection l : listeLinks)
 				if (l.getSource().equals(GNwhich)) {
-					T[i] = l.getDestination().getText();
-					++i;
+					T[i++] = l.getDestination().getText();
 				}
+			T[i] = "-1";
 			if (i == 0)
 				System.out.println("Cette personne ne possède aucun enfant...");
 			else {
-				addNode("." + which + ".");
+				if (this.findNode(which) == null) addNode("." + which + ".");
 				for (i = 0; i < listeLinks.size() && T[i] != "-1"; i++) {
 					addNode("." + T[i] + ".");
 					addLink("." + which + ".", "." + T[i] + ".");
-					System.out.println(T[i]);
 				}
 			}
-
 		}
+		return T;
+	}
+
+	public void desc(String which) {
+		int i = 0;
+		String T[] = sons(which);
+		while(T[i]!="-1")
+			desc(T[i++]);
 	}
 
 	public void addLink(String from, String to) {

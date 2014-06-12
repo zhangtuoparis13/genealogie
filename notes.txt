@@ -1,2 +1,14 @@
-﻿Problème suppression Nodes
-Terminer affichage Fils
+﻿Demandé :
+
+ok Charger un arbre depuis un fichier XML, veuillez télécharger depuis le lien suivant file.xml un exemple d'arbre.
+ok Visualiser un arbre.
+ok Ajouter un nœud à l’arbre.
+ok Créer une liaison entre deux  nœuds.
+ok Supprimer la liaison entre deux nœuds.
+ok Tous les fils d’un nœud donné.
+ok Afficher tous les descendants d’un nœud donné.
+Afficher  tous les ascendants d’un nœud donné.
+Afficher  tous les oncles d’un nœud donné
+Afficher  tous les cousins d’un nœud donné
+Afficher  tous les oncles en communs de deux nœuds donnés.
+Afficher  tous les cousins de deux nœuds donnés.
