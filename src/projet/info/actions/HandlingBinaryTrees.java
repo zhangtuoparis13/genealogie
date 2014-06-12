@@ -112,6 +112,7 @@ public class HandlingBinaryTrees {
 		jr.assignClassToCommand("sons", "projet.info.actions.ShowSons");
 		jr.assignClassToCommand("desc", "projet.info.actions.ShowDescendants");
 		jr.assignClassToCommand("asc", "projet.info.actions.ShowAscendants");
+		jr.assignClassToCommand("oncles", "projet.info.actions.ShowOncles");
 		jr.init();
 		jr.setIsInteractive(interactive);
 		// parse and execute commands.
@@ -143,11 +144,14 @@ public class HandlingBinaryTrees {
 	private Node findNode(String toFind) {
 		Node FoundNode = null;
 		int i = 0;
-		if (!myNetwork.nodes().isEmpty()) {
+		if (!myNetwork.nodes().isEmpty() && toFind != null) {
+			System.out.println("Paramètre : " + toFind);
 			while (FoundNode == null && i < myNetwork.nodes().size()) {
-				if (FoundNode == null)
-					if (toFind.equals(myNetwork.nodes().get(i).getName()))
+				if (FoundNode == null) {
+					if (toFind.equals(myNetwork.nodes().get(i).getName())) {
 						FoundNode = myNetwork.nodes().get(i);
+					}
+				}
 				++i;
 			}
 		}
@@ -157,7 +161,7 @@ public class HandlingBinaryTrees {
 	private GraphNode findGNode(String toFind) {
 		GraphNode FoundGNode = null;
 		int i = 0;
-		if (nbrNodes > 0) {
+		if (nbrNodes > 0 && toFind != null) {
 			while (FoundGNode == null && i < nbrNodes) {
 				if (FoundGNode == null)
 					if (toFind.equals(listeNoeuds.get(i).getText()))
@@ -196,6 +200,10 @@ public class HandlingBinaryTrees {
 	}
 
 	public String[] sons(String which) {
+		return sons(which, true);
+	}
+
+	public String[] sons(String which, Boolean display) {
 		int i = 0;
 		String T[] = new String[listeLinks.size()];
 		Node Nwhich = this.findNode(which);
@@ -206,7 +214,7 @@ public class HandlingBinaryTrees {
 					+ ((Nwhich == null) ? "s" : "") + " !");
 		} else {
 			GraphNode GNwhich = this.findGNode(which);
-			
+
 			for (GraphConnection l : listeLinks)
 				if (l.getSource().equals(GNwhich)) {
 					T[i++] = l.getDestination().getText();
@@ -214,8 +222,9 @@ public class HandlingBinaryTrees {
 			T[i] = "-1";
 			if (i == 0)
 				System.out.println("Cette personne ne possède aucun enfant...");
-			else {
-				if (this.findNode(which) == null) addNode("." + which + ".");
+			else if (display) {
+				if (this.findNode(which) == null)
+					addNode("." + which + ".");
 				for (i = 0; i < listeLinks.size() && T[i] != "-1"; i++) {
 					addNode("." + T[i] + ".");
 					addLink("." + which + ".", "." + T[i] + ".");
@@ -224,8 +233,12 @@ public class HandlingBinaryTrees {
 		}
 		return T;
 	}
-	
-	public String[] father(String which) {
+
+	public String[] fathers(String which) {
+		return fathers(which, true);
+	}
+
+	public String[] fathers(String which, Boolean display) {
 		int i = 0;
 		String T[] = new String[listeLinks.size()];
 		Node Nwhich = this.findNode(which);
@@ -236,7 +249,7 @@ public class HandlingBinaryTrees {
 					+ ((Nwhich == null) ? "s" : "") + " !");
 		} else {
 			GraphNode GNwhich = this.findGNode(which);
-			
+
 			for (GraphConnection l : listeLinks)
 				if (l.getDestination().equals(GNwhich)) {
 					T[i++] = l.getSource().getText();
@@ -244,8 +257,9 @@ public class HandlingBinaryTrees {
 			T[i] = "-1";
 			if (i == 0)
 				System.out.println("Cette personne ne possède aucun enfant...");
-			else {
-				if (this.findNode(which) == null) addNode("." + which + ".");
+			else if (display) {
+				if (this.findNode(which) == null)
+					addNode("." + which + ".");
 				for (i = 0; i < listeLinks.size() && T[i] != "-1"; i++) {
 					addNode("." + T[i] + ".");
 					addLink("." + T[i] + ".", "." + which + ".");
@@ -258,15 +272,39 @@ public class HandlingBinaryTrees {
 	public void desc(String which) {
 		int i = 0;
 		String T[] = sons(which);
-		while(T[i]!="-1")
+
+		while (T[i] != "-1")
 			desc(T[i++]);
 	}
 
 	public void asc(String which) {
+		asc(which, true, -1);
+	}
+
+	public String[][] asc(String which, Boolean display, int val) {
+		String T[][] = new String[listeLinks.size() * listeLinks.size()][listeLinks
+				.size() * listeLinks.size()];
 		int i = 0;
-		String T[] = father(which);
-		while(T[i]!="-1")
-			asc(T[i++]);
+		T[val][i] = fathers(which, display);
+
+		while (T[val][i] != "-1")
+			T = asc(T[val][i++], display, ++val);
+		return T;
+	}
+
+	public void oncles(String which) {
+		oncles(which, 0);
+	}
+
+	public void oncles(String which, int i) {
+		String T[][];
+
+		T = asc(which, false, 0); // x2
+		/*
+		 * while (T[i++] != "-1"); if (T[0] != "-1") sons(T[i], true); // x1
+		 */
+		for (String[] k : T)
+			System.out.println(k);
 	}
 
 	public void addLink(String from, String to) {
