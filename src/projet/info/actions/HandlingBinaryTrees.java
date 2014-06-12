@@ -240,7 +240,8 @@ public class HandlingBinaryTrees {
 
 	public String[] fathers(String which, Boolean display) {
 		int i = 0;
-		String T[] = new String[listeLinks.size()];
+		String T[][] = new String[listeLinks.size() * listeLinks.size()][listeLinks
+		                                                 				.size() * listeLinks.size()];
 		Node Nwhich = this.findNode(which);
 
 		if (Nwhich == null) {
@@ -285,7 +286,7 @@ public class HandlingBinaryTrees {
 		String T[][] = new String[listeLinks.size() * listeLinks.size()][listeLinks
 				.size() * listeLinks.size()];
 		int i = 0;
-		T[val][i] = fathers(which, display);
+		T = fathers(which, display);
 
 		while (T[val][i] != "-1")
 			T = asc(T[val][i++], display, ++val);
