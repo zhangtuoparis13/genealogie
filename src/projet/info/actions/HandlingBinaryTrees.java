@@ -109,6 +109,7 @@ public class HandlingBinaryTrees {
 		jr.assignClassToCommand("addLink", "projet.info.actions.AddLink");
 		jr.assignClassToCommand("delLink", "projet.info.actions.DelLink");
 		jr.assignClassToCommand("loadData", "projet.info.actions.LoadData");
+		jr.assignClassToCommand("saveData", "projet.info.actions.SaveData");
 		jr.assignClassToCommand("sons", "projet.info.actions.ShowSons");
 		jr.assignClassToCommand("desc", "projet.info.actions.ShowDescendants");
 		jr.assignClassToCommand("asc", "projet.info.actions.ShowAscendants");
@@ -145,7 +146,6 @@ public class HandlingBinaryTrees {
 		Node FoundNode = null;
 		int i = 0;
 		if (!myNetwork.nodes().isEmpty() && toFind != null) {
-			System.out.println("Paramètre : " + toFind);
 			while (FoundNode == null && i < myNetwork.nodes().size()) {
 				if (FoundNode == null) {
 					if (toFind.equals(myNetwork.nodes().get(i).getName())) {
@@ -199,13 +199,25 @@ public class HandlingBinaryTrees {
 		--nbrNodes;
 	}
 
+	private String[] ListToStatic(ArrayList<String> T) {
+		String resultfinal[] = new String[T.size()];
+		T.toArray(resultfinal);
+		return resultfinal;
+	}
+	
+	private ArrayList<String> StaticToList(String T[]) {
+		//ArrayList<String> aListNumbers = new ArrayList<String>(Arrays.asList(strValues));
+		//List<String> strings = Arrays.asList("foo","bar");
+		return null;
+	}
+
 	public String[] sons(String which) {
 		return sons(which, true);
 	}
 
 	public String[] sons(String which, Boolean display) {
 		int i = 0;
-		String T[] = new String[listeLinks.size()];
+		ArrayList<String> T = new ArrayList<String>();
 		Node Nwhich = this.findNode(which);
 
 		if (Nwhich == null) {
@@ -217,26 +229,26 @@ public class HandlingBinaryTrees {
 
 			for (GraphConnection l : listeLinks)
 				if (l.getSource().equals(GNwhich)) {
-					T[i++] = l.getDestination().getText();
+					T.add(l.getDestination().getText());
+					++i;
 				}
-			T[i] = "-1";
 			if (i == 0)
 				System.out.println("Cette personne ne possède aucun enfant...");
 			else if (display) {
 				if (this.findNode(which) == null)
 					addNode("." + which + ".");
-				for (i = 0; i < listeLinks.size() && T[i] != "-1"; i++) {
-					addNode("." + T[i] + ".");
-					addLink("." + which + ".", "." + T[i] + ".");
+				for (i = 0; i < listeLinks.size() && i < T.size(); i++) {
+					addNode("." + T.get(i).toString() + ".");
+					addLink("." + which + ".", "." + T.get(i).toString() + ".");
 				}
 			}
 		}
-		return T;
+		return ListToStatic(T);
 	}
 
 	public String[] father(String which) {
 		int i = 0;
-		String T[] = new String[listeLinks.size()];
+		ArrayList<String> T = new ArrayList<String>();
 		Node Nwhich = this.findNode(which);
 
 		if (Nwhich == null) {
@@ -245,23 +257,24 @@ public class HandlingBinaryTrees {
 					+ ((Nwhich == null) ? "s" : "") + " !");
 		} else {
 			GraphNode GNwhich = this.findGNode(which);
-			
+
 			for (GraphConnection l : listeLinks)
 				if (l.getDestination().equals(GNwhich)) {
-					T[i++] = l.getSource().getText();
+					T.add(l.getSource().getText());
+					++i;
 				}
-			T[i] = "-1";
 			if (i == 0)
 				System.out.println("Cette personne ne poss�de aucun enfant...");
 			else {
-				if (this.findNode(which) == null) addNode("." + which + ".");
-				for (i = 0; i < listeLinks.size() && T[i] != "-1"; i++) {
-					addNode("." + T[i] + ".");
-					addLink("." + T[i] + ".", "." + which + ".");
+				if (this.findNode(which) == null)
+					addNode("." + which + ".");
+				for (i = 0; i < listeLinks.size() && i < T.size(); ++i) {
+					addNode("." + T.get(i).toString() + ".");
+					addLink("." + T.get(i).toString() + ".", "." + which + ".");
 				}
 			}
 		}
-		return T;
+		return ListToStatic(T);
 	}
 
 	public void desc(String which) {
@@ -275,28 +288,34 @@ public class HandlingBinaryTrees {
 	public void asc(String which) {
 		int i = 0;
 		String T[] = father(which);
-		while(T[i]!="-1")
+		while (T[i] != "-1")
 			asc(T[i++]);
 	}
-	
-	public void oncles(String which) {
-		
+
+	public String[] oncles(String which) {
+		String T[] = father(which); // liste des pères
+		ArrayList<String> GP = new ArrayList<String>();
+		for (String papa : T) {
+			String temp[] = father(papa);
+			for (String output : temp)
+				if (!GP.contains(output))
+					GP.add(output);
+		}
+		// on a tous les grands pères en liste unique
+		ArrayList<String> Result = new ArrayList<String>();
+		for (String papi : GP) {
+			String temp[] = sons(papi, false);
+			for (String marredeslocales : temp)
+				// Ai-je déjà stocké le résultat ? Suis-je mon propre père ?
+				if (!(Result.contains(marredeslocales) || T.contains(marredeslocales)))
+					Result.add(marredeslocales);
+		}
+		String resultfinal[] = new String[Result.size()];
+		Result.toArray(resultfinal);
+		for (int r = 0; r < Result.size(); ++r)
+			System.out.println(resultfinal[r]);
+		return resultfinal;
 	}
-
-/*	public void oncles(String which) {
-		oncles(which, 0);
-	}
-
-	public void oncles(String which, int i) {
-		String T[][];
-
-		T = asc(which, false, 0); // x2
-		/*
-		 * while (T[i++] != "-1"); if (T[0] != "-1") sons(T[i], true); // x1
-		 */
-		/*for (String[] k : T)
-			System.out.println(k);
-	}*/
 
 	public void addLink(String from, String to) {
 		Node Nfrom = this.findNode(from), Nto = this.findNode(to);
