@@ -15,6 +15,7 @@ public class ShowSons implements CommandLine.ICommand {
 		myDisplay.asyncExec(new Runnable() {
 			public void run() {
 				HandlingBinaryTrees grapher = new HandlingBinaryTrees();
+				grapher.cleanColor();
 				grapher.sons(arg);
 				grapher.showGraph();
 			}

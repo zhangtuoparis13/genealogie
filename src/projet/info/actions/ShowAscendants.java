@@ -16,6 +16,7 @@ public class ShowAscendants implements CommandLine.ICommand {
 		myDisplay.asyncExec(new Runnable() {
 			public void run() {
 				HandlingBinaryTrees grapher = new HandlingBinaryTrees();
+				grapher.cleanColor();
 				grapher.asc(arg);
 				grapher.showGraph();
 			}

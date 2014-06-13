@@ -17,6 +17,7 @@ public class OnclesCom implements CommandLine.ICommand {
 			myDisplay.asyncExec(new Runnable() {
 				public void run() {
 					HandlingBinaryTrees grapher = new HandlingBinaryTrees();
+					grapher.cleanColor();
 					grapher.onclesCom(arg1,arg2);
 					grapher.showGraph();
 				}

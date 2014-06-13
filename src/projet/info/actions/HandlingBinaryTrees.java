@@ -139,6 +139,11 @@ public class HandlingBinaryTrees {
 		myGraph.applyLayout();
 		myShell.layout();
 	}
+	
+	public void cleanColor() {
+		for (GraphNode x : listeNoeuds)
+			x.setBackgroundColor(ColorConstants.cyan);
+	}
 
 	public void addNode() {
 		addNode(String.valueOf(nbrNodes));
@@ -249,15 +254,9 @@ public class HandlingBinaryTrees {
 				}
 			if (i == 0)
 				System.out.println("Cette personne ne possède aucun enfant...");
-			else if (display) {
-				//gn.setBackgroundColor(ColorConstants.cyan);
-				if (this.findNode(which) == null)
-					addNode("." + which + ".");
-				for (i = 0; i < listeLinks.size() && i < T.size(); i++) {
-					addNode("." + T.get(i).toString() + ".");
-					addLink("." + which + ".", "." + T.get(i).toString() + ".");
-				}
-			}
+			else if (display)
+				for (String x : T)
+					findGNode(x).setBackgroundColor(ColorConstants.yellow);
 		}
 		return T;
 	}
@@ -283,14 +282,9 @@ public class HandlingBinaryTrees {
 				}
 			if (i == 0)
 				System.out.println("Cette personne ne possede aucun enfant...");
-			else if (display) {
-				if (this.findNode(which) == null)
-					addNode("." + which + ".");
-				for (i = 0; i < listeLinks.size() && i < T.size(); ++i) {
-					addNode("." + T.get(i).toString() + ".");
-					addLink("." + T.get(i).toString() + ".", "." + which + ".");
-				}
-			}
+			else if (display)
+				for (String x : T)
+					findGNode(x).setBackgroundColor(ColorConstants.yellow);
 		}
 		return T;
 	}
@@ -333,7 +327,7 @@ public class HandlingBinaryTrees {
 			}
 			if (display)
 				for (String x : Result)
-					addNode("." + x + ".");
+					findGNode(x).setBackgroundColor(ColorConstants.yellow);
 		} else {
 			System.out.println("Erreur oncles : Node cible non trouve");
 		}
@@ -359,8 +353,8 @@ public class HandlingBinaryTrees {
 						Result.add(locale);
 			}
 			if (display)
-				for (String x : Result)
-					addNode("." + x + ".");
+				for (String x : T)
+					findGNode(x).setBackgroundColor(ColorConstants.yellow);
 		} else {
 			System.out.println("Erreur cousins : Node cible non trouvé");
 		}
@@ -380,7 +374,7 @@ public class HandlingBinaryTrees {
 				if(onclesWhich.contains(comp))
 					Result.add(comp);
 			for (String x : Result)
-				addNode("." + x + ".");
+				findGNode(x).setBackgroundColor(ColorConstants.yellow);
 		}
 	}
 	
@@ -397,7 +391,7 @@ public class HandlingBinaryTrees {
 				if(onclesWhich.contains(comp))
 					Result.add(comp);
 			for (String x : Result)
-				addNode("." + x + ".");			
+				findGNode(x).setBackgroundColor(ColorConstants.yellow);			
 		}
 	}
 
@@ -412,8 +406,10 @@ public class HandlingBinaryTrees {
 			myNetwork.connect(Nfrom, Nto);
 			GraphNode GNfrom = this.findGNode(from);
 			GraphNode GNto = this.findGNode(to);
-			listeLinks.add(new GraphConnection(myGraph, ZestStyles.NONE,
+			listeLinks.add(new GraphConnection(myGraph, ZestStyles.CONNECTIONS_DIRECTED,
 					GNfrom, GNto));
+			listeLinks.get(listeLinks.size()-1).changeLineColor(myGraph.getDisplay().getSystemColor(SWT.COLOR_MAGENTA));
+			listeLinks.get(listeLinks.size()-1).setLineWidth(2);	
 		}
 	}
 
