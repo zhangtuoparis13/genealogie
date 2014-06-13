@@ -203,13 +203,16 @@ public class HandlingBinaryTrees {
 				myNetwork.disconnect(Ndel, l);
 			myNetwork.nodes().remove(Ndel);
 			// On détruit le node externe
-			int i = 0;
+			ArrayList<GraphConnection> toRemove = new ArrayList<GraphConnection>();
 			for (GraphConnection l : listeLinks) {
 				if (l.getSource().equals(GNdel)) {
-					listeLinks.get(i).dispose();
-					listeLinks.remove(i);
+					toRemove.add(l);
 				}
-				++i;
+			}
+			// On assume que lprime est inclus dans listeLinks
+			for(GraphConnection lprime : toRemove) {
+					listeLinks.get(listeLinks.indexOf(lprime)).dispose();
+					listeLinks.remove(listeLinks.indexOf(lprime));
 			}
 			GNdel.dispose();
 			listeNoeuds.remove(GNdel);
@@ -222,17 +225,12 @@ public class HandlingBinaryTrees {
 		T.toArray(resultfinal);
 		return resultfinal;
 	}
-	
-/*	private ArrayList<String> StaticToList(String T[]) {
-		
-		return null;
-	}*/
 
-	public String[] sons(String which) {
+	public ArrayList<String> sons(String which) {
 		return sons(which, true);
 	}
 
-	public String[] sons(String which, Boolean display) {
+	public ArrayList<String> sons(String which, Boolean display) {
 		int i = 0;
 		ArrayList<String> T = new ArrayList<String>();
 		Node Nwhich = this.findNode(which);
@@ -252,6 +250,7 @@ public class HandlingBinaryTrees {
 			if (i == 0)
 				System.out.println("Cette personne ne possède aucun enfant...");
 			else if (display) {
+				//gn.setBackgroundColor(ColorConstants.cyan);
 				if (this.findNode(which) == null)
 					addNode("." + which + ".");
 				for (i = 0; i < listeLinks.size() && i < T.size(); i++) {
@@ -263,7 +262,11 @@ public class HandlingBinaryTrees {
 		return T;
 	}
 
-	public String[] father(String which) {
+	public ArrayList<String> father(String which) {
+		return father(which, true);
+	}
+
+	public ArrayList<String> father(String which, Boolean display) {
 		int i = 0;
 		ArrayList<String> T = new ArrayList<String>();
 		Node Nwhich = this.findNode(which);
@@ -280,7 +283,7 @@ public class HandlingBinaryTrees {
 				}
 			if (i == 0)
 				System.out.println("Cette personne ne possede aucun enfant...");
-			else {
+			else if (display) {
 				if (this.findNode(which) == null)
 					addNode("." + which + ".");
 				for (i = 0; i < listeLinks.size() && i < T.size(); ++i) {
@@ -293,97 +296,109 @@ public class HandlingBinaryTrees {
 	}
 
 	public void desc(String which) {
-		int i = 0;
-		String T[] = sons(which);
-
-		while (T[i] != "-1")
-			desc(T[i++]);
+		ArrayList<String> T = sons(which);
+		for(String test : T)
+			desc(test);
 	}
 
 	public void asc(String which) {
-		int i = 0;
-		String T[] = father(which);
-		while (T[i] != "-1")
-			asc(T[i++]);
+		ArrayList<String> T = father(which);
+		for(String test : T)
+			asc(test);
+	}
+	
+	public ArrayList<String> oncles(String which) {
+		return oncles(which, true);
 	}
 
-	public ArrayList<String> oncles(String which) {
+	public ArrayList<String> oncles(String which, Boolean display) {
 		ArrayList<String> Result = null;
 		if(findNode(which)!=null) {
-			ArrayList<String> T = father(which); // liste des pÃ¨res
+			ArrayList<String> T = father(which, false); // liste des pères
 			ArrayList<String> GP = new ArrayList<String>();
 			for (String papa : T) {
-				ArrayList<String> temp = father(papa);
+				ArrayList<String> temp = father(papa, false);
 				for (String output : temp)
 					if (!GP.contains(output))
 						GP.add(output);
 			}
-			// on a tous les grands pÃ¨res en liste unique
+			// on a tous les grands pères en liste unique
 			Result = new ArrayList<String>();
 			for (String papi : GP) {
 				ArrayList<String> temp = sons(papi, false);
 				for (String marredeslocales : temp)
-					// Ai-je dÃ©jÃ  stockÃ© le rÃ©sultat ? Suis-je mon propre pÃ¨re ?
+					// Ai-je déjà  stocké le résultat ? Suis-je mon propre père ?
 					if (!(Result.contains(marredeslocales) || T.contains(marredeslocales)))
 						Result.add(marredeslocales);
 			}
+			if (display)
+				for (String x : Result)
+					addNode("." + x + ".");
 		} else {
-			System.out.println("Erreur oncles : Node cible non trouvÃ©");
+			System.out.println("Erreur oncles : Node cible non trouve");
 		}
 		return Result;
 	}
-	
+
 	public ArrayList<String> cousins(String which) {
+		return cousins(which, true);
+	}
+		public ArrayList<String> cousins(String which, Boolean display) {
 		ArrayList<String> Result = null;
 		
 		if(findNode(which)!=null) {
-			// On rÃ©utilise oncles() pour sauter des Ã©tapes dans la fonction
-			ArrayList<String> T = oncles(which);
+			// On réutilise oncles() pour sauter des étapes dans la fonction
+			ArrayList<String> T = oncles(which, false);
 			Result=new ArrayList<String>();
 			for(String papi : T) {
 				ArrayList<String> temp = sons(papi, false);
 				for(String locale : temp)
-				// Ne rajoutons que si ce n'est pas dÃ©jÃ  fait
-				// On a dÃ©jÃ  supprimÃ© les pÃ¨res via la fonction oncles(), donc, inutile en thÃ©orie de vÃ©rifier que nous ne sommes pas notre propre cousin
+				// Ne rajoutons que si ce n'est pas déjà  fait
+				// On a déjà  supprimé les pères via la fonction oncles(), donc, inutile en théorie de vérifier que nous ne sommes pas notre propre cousin
 					if(!Result.contains(locale))
 						Result.add(locale);
 			}
+			if (display)
+				for (String x : Result)
+					addNode("." + x + ".");
 		} else {
-			System.out.println("Erreur cousins : Node cible non trouvÃ©");
+			System.out.println("Erreur cousins : Node cible non trouvé");
 		}
 		return Result;
 	}
 	
-	public ArrayList<String> onclesCom(String which,String who) {
+	public void onclesCom(String which,String who) {
 		ArrayList<String> Result = null;
 		if(findNode(which)==null || findNode(who)==null) {
-			System.out.println("Erreur compOncles : Node introuvable");
+			System.out.println("Erreur onclesCom : Node introuvable");
 		} else {	
-			ArrayList<String> onclesWho = oncles(who);
-			ArrayList<String> onclesWhich = oncles(which);
+			ArrayList<String> onclesWho = oncles(who, false);
+			ArrayList<String> onclesWhich = oncles(which, false);
 			Result = new ArrayList<String>();
 			// Le tableau parcouru n'a que peu d'importance
 			for(String comp : onclesWho)
 				if(onclesWhich.contains(comp))
 					Result.add(comp);
+			for (String x : Result)
+				addNode("." + x + ".");
 		}
-		return Result;
 	}
 	
-	public ArrayList<String> cousinsCom(String which,String who) {
+	public void cousinsCom(String which,String who) {
 		ArrayList<String> Result = null;
 		if(findNode(which)==null || findNode(who)==null) {
-			System.out.println("Erreur compOncles : Node introuvable");
+			System.out.println("Erreur onclesCom : Node introuvable");
 		} else {
-			ArrayList<String> onclesWho = cousins(who);
-			ArrayList<String> onclesWhich = cousins(which);
+			ArrayList<String> onclesWho = cousins(who, false);
+			ArrayList<String> onclesWhich = cousins(which, false);
 			Result = new ArrayList<String>();
 			// Le tableau parcouru n'a que peu d'importance
 			for(String comp : onclesWho)
 				if(onclesWhich.contains(comp))
 					Result.add(comp);
+			for (String x : Result)
+				addNode("." + x + ".");			
 		}
-		return Result;
 	}
 
 	public void addLink(String from, String to) {
