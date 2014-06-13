@@ -110,8 +110,8 @@ public class HandlingBinaryTrees {
 
 		// initialize the command line object.
 		CommandLine jr = new CommandLine();
-		jr.setCommandLinePrompt("Commande > ");
-		jr.setCommandLineVersion("Ligne de commande v0.05P");
+		jr.setCommandLinePrompt("Commande > ");	
+		jr.setCommandLineVersion("Ligne de commande v1.0RC");
 		jr.assignClassToCommand("addNode", "projet.info.actions.AddNode");
 		jr.assignClassToCommand("delNode", "projet.info.actions.DelNode");
 		jr.assignClassToCommand("renameNode", "projet.info.actions.RenameNode");
@@ -167,12 +167,10 @@ public class HandlingBinaryTrees {
 			ArrayList<String> NodeFils = new ArrayList<String>();
 			ArrayList<String> NodePere = new ArrayList<String>();
 			for(Link l : myNetwork.links()) {
-				if(l.source()==Nrename)					// C'est le pÃ¨re de quelqu'un...
-					NodeFils.add(l.destination().toString().
-							substring(1,l.destination().toString().length()-1));		// ...donc, on ajoute son fils
+				if(l.source()==Nrename)					// C'est le père de quelqu'un...
+					NodeFils.add(l.destination().getName());		// ...donc, on ajoute son fils
 				else if(l.destination()==Nrename)		// C'est le fils de quelqu'un...
-					NodePere.add(l.source().toString().
-							substring(1,l.source().toString().length()-1));			// ...donc, on ajoute son pÃ¨re
+					NodePere.add(l.source().getName());			// ...donc, on ajoute son père
 			}
 			delNode(oldName);
 			addNode(newName);
