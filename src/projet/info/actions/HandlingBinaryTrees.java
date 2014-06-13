@@ -30,6 +30,8 @@ import org.eclipse.zest.layouts.LayoutStyles;
 import org.eclipse.zest.layouts.algorithms.TreeLayoutAlgorithm;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -126,6 +128,8 @@ public class HandlingBinaryTrees {
 		jr.assignClassToCommand("cousins", "projet.info.actions.ShowCousins");
 		jr.assignClassToCommand("onclesCom", "projet.info.actions.OnclesCom");
 		jr.assignClassToCommand("cousinsCom", "projet.info.actions.CousinsCom");
+		jr.assignClassToCommand("reset", "projet.info.actions.Reset");
+		jr.assignClassToCommand("WTFAmIDoing", "projet.info.actions.SpaceDoge");
 		jr.init();
 		jr.setIsInteractive(interactive);
 		// parse and execute commands.
@@ -467,6 +471,30 @@ public class HandlingBinaryTrees {
 		for_str = for_str.replace("\n", "");
 		for_str = for_str.replace("\t", "");
 		return for_str;
+	}
+	
+	public void reset() {
+		ArrayList<String> temp = new ArrayList<String>();
+		for(Node n : myNetwork.nodes())
+			temp.add(n.getName());
+		for(String s : temp)
+			delNode(s);
+	}
+	
+	// Pourquoi j'ai fait cela ?
+	public void doge() {
+		reset();
+		if(new File("moo.jpg").exists()) {
+			GraphNode gn = new GraphNode(myGraph, ZestStyles.NODES_NO_LAYOUT_RESIZE|ZestStyles.NODES_HIDE_TEXT,
+											"Pourquoi j'ai fait cela ?",new Image(myDisplay,"moo.jpg"));
+			gn.setBackgroundColor(ColorConstants.white);
+			listeNoeuds.add(gn);
+			Node patate = new Node("Pourquoi j'ai fait cela ?");
+			myNetwork.addNode(patate);
+			++nbrNodes;
+		} else {
+			System.out.println("Erreur display : Meuh veut dire meuh !");
+		}
 	}
 
 	public void loadData(Document XMLFile) {
