@@ -114,6 +114,7 @@ public class HandlingBinaryTrees {
 		jr.setCommandLineVersion("Ligne de commande v0.05P");
 		jr.assignClassToCommand("addNode", "projet.info.actions.AddNode");
 		jr.assignClassToCommand("delNode", "projet.info.actions.DelNode");
+		jr.assignClassToCommand("renameNode", "projet.info.actions.RenameNode");
 		jr.assignClassToCommand("addLink", "projet.info.actions.AddLink");
 		jr.assignClassToCommand("delLink", "projet.info.actions.DelLink");
 		jr.assignClassToCommand("loadData", "projet.info.actions.LoadData");
@@ -156,6 +157,30 @@ public class HandlingBinaryTrees {
 		Node patate = new Node(nom);
 		myNetwork.addNode(patate);
 		++nbrNodes;
+	}
+	
+	public void renameNode(String oldName,String newName) {
+		Node Nrename=findNode(oldName);
+		if(Nrename==null) {
+			System.out.println("Erreur delNode : "+oldName+" n'existe pas !");
+		} else {
+			ArrayList<String> NodeFils = new ArrayList<String>();
+			ArrayList<String> NodePere = new ArrayList<String>();
+			for(Link l : myNetwork.links()) {
+				if(l.source()==Nrename)					// C'est le pÃ¨re de quelqu'un...
+					NodeFils.add(l.destination().toString().
+							substring(1,l.destination().toString().length()-1));		// ...donc, on ajoute son fils
+				else if(l.destination()==Nrename)		// C'est le fils de quelqu'un...
+					NodePere.add(l.source().toString().
+							substring(1,l.source().toString().length()-1));			// ...donc, on ajoute son pÃ¨re
+			}
+			delNode(oldName);
+			addNode(newName);
+			for(String n : NodeFils)
+				addLink(newName, n);
+			for(String n : NodePere)
+				addLink(n, newName);
+		}
 	}
 
 	private Node findNode(String toFind) {
