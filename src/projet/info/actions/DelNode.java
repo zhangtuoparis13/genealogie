@@ -26,6 +26,7 @@ public class DelNode implements CommandLine.ICommand {
 				myDisplay.asyncExec(new Runnable() {
 					public void run() {
 						HandlingBinaryTrees grapher = new HandlingBinaryTrees();
+						grapher.cleanColor();
 						grapher.delNode(arg);
 						grapher.showGraph();
 					}

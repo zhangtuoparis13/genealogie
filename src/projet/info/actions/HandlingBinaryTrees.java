@@ -118,7 +118,7 @@ public class HandlingBinaryTrees {
 		jr.assignClassToCommand("delLink", "projet.info.actions.DelLink");
 		jr.assignClassToCommand("loadData", "projet.info.actions.LoadData");
 		jr.assignClassToCommand("saveData", "projet.info.actions.SaveData");
-		jr.assignClassToCommand("sons", "projet.info.actions.ShowSons");
+		jr.assignClassToCommand("fils", "projet.info.actions.ShowFils");
 		jr.assignClassToCommand("desc", "projet.info.actions.ShowDescendants");
 		jr.assignClassToCommand("asc", "projet.info.actions.ShowAscendants");
 		jr.assignClassToCommand("oncles", "projet.info.actions.ShowOncles");
@@ -231,17 +231,17 @@ public class HandlingBinaryTrees {
 		return resultfinal;
 	}
 
-	public ArrayList<String> sons(String which) {
-		return sons(which, true);
+	public ArrayList<String> fils(String which) {
+		return fils(which, true);
 	}
 
-	public ArrayList<String> sons(String which, Boolean display) {
+	public ArrayList<String> fils(String which, Boolean display) {
 		int i = 0;
 		ArrayList<String> T = new ArrayList<String>();
 		Node Nwhich = this.findNode(which);
 
 		if (Nwhich == null) {
-			System.out.println("Erreur sons : Personne"
+			System.out.println("Erreur fils : Personne"
 					+ ((Nwhich == null) ? "s" : "") + " non existante"
 					+ ((Nwhich == null) ? "s" : "") + " !");
 		} else {
@@ -271,7 +271,7 @@ public class HandlingBinaryTrees {
 		Node Nwhich = this.findNode(which);
 
 		if (Nwhich == null) {
-			System.out.println("Erreur sons : Personne non existante !");
+			System.out.println("Erreur fils : Personne non existante !");
 		} else {
 			GraphNode GNwhich = this.findGNode(which);
 
@@ -290,7 +290,7 @@ public class HandlingBinaryTrees {
 	}
 
 	public void desc(String which) {
-		ArrayList<String> T = sons(which);
+		ArrayList<String> T = fils(which);
 		for(String test : T)
 			desc(test);
 	}
@@ -319,7 +319,7 @@ public class HandlingBinaryTrees {
 			// on a tous les grands pères en liste unique
 			Result = new ArrayList<String>();
 			for (String papi : GP) {
-				ArrayList<String> temp = sons(papi, false);
+				ArrayList<String> temp = fils(papi, false);
 				for (String marredeslocales : temp)
 					// Ai-je déjà  stocké le résultat ? Suis-je mon propre père ?
 					if (!(Result.contains(marredeslocales) || T.contains(marredeslocales)))
@@ -345,7 +345,7 @@ public class HandlingBinaryTrees {
 			ArrayList<String> T = oncles(which, false);
 			Result=new ArrayList<String>();
 			for(String papi : T) {
-				ArrayList<String> temp = sons(papi, false);
+				ArrayList<String> temp = fils(papi, false);
 				for(String locale : temp)
 				// Ne rajoutons que si ce n'est pas déjà  fait
 				// On a déjà  supprimé les pères via la fonction oncles(), donc, inutile en théorie de vérifier que nous ne sommes pas notre propre cousin

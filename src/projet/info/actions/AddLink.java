@@ -30,6 +30,7 @@ public class AddLink implements CommandLine.ICommand {
 					myDisplay.asyncExec(new Runnable() {
 						public void run() {
 							HandlingBinaryTrees grapher = new HandlingBinaryTrees();
+							grapher.cleanColor();
 							grapher.addLink(arg1, arg2);
 							grapher.showGraph();
 						}

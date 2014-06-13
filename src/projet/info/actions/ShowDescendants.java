@@ -12,7 +12,7 @@ public class ShowDescendants implements CommandLine.ICommand {
 		System.out
 				.println("Running the command : " + v.elementAt(0).toString());
 		Display myDisplay = HandlingBinaryTrees.getDisplay();
-		final String arg = v.get(1).toString();
+		final String arg = ((v.get(1) instanceof Double) ? new StringBuilder().append(""+(((Double) v.get(1)).intValue())).toString() : v.get(1).toString());
 		myDisplay.asyncExec(new Runnable() {
 			public void run() {
 				HandlingBinaryTrees grapher = new HandlingBinaryTrees();

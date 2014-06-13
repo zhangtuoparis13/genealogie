@@ -27,6 +27,7 @@ public class AddNode implements CommandLine.ICommand {
 				myDisplay.asyncExec(new Runnable() {
 					public void run() {
 						HandlingBinaryTrees grapher = new HandlingBinaryTrees();
+						grapher.cleanColor();
 						grapher.addNode(arg);
 						grapher.showGraph();
 					}

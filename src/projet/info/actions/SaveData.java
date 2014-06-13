@@ -17,6 +17,7 @@ public class SaveData implements CommandLine.ICommand {
 				myDisplay.asyncExec(new Runnable() {
 					public void run() {
 						HandlingBinaryTrees grapher = new HandlingBinaryTrees();
+						grapher.cleanColor();
 						grapher.saveData(arg);
 						grapher.showGraph();
 					}
@@ -28,6 +29,7 @@ public class SaveData implements CommandLine.ICommand {
 			myDisplay.asyncExec(new Runnable() {
 				public void run() {
 					HandlingBinaryTrees grapher = new HandlingBinaryTrees();
+					grapher.cleanColor();
 					grapher.saveData();
 					grapher.showGraph();
 				}
